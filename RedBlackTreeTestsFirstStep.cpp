@@ -17,23 +17,6 @@
 
 using namespace std;
 
-struct RBTNode {
-    int data;
-    int color;
-    RBTNode* left;
-    RBTNode* right;
-    RBTNode* parent;
-
-    //Constructor
-    RBTNode(int val) {
-        data = val;
-        color = COLOR_RED; //New node is red
-        left = nullptr;
-        right = nullptr;
-        parent = nullptr;
-    }
-};
-
 bool RedBlackTree::Contains(int value) const {
     RBTNode* current = root;
     while (current != nullptr) {
