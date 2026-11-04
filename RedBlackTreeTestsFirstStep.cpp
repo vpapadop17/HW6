@@ -92,6 +92,22 @@ void RedBlackTree::Insert(int value){
 	numItems++;
 }
 	
+int RedBlackTree::GetMin(RBTNode* node){
+	if (root == nullptr) {
+        throw std::runtime_error("Tree is empty");
+    }
+
+    // 2. Start at the root
+    RBTNode* current = root;
+
+    // 3. Keep moving left until there are no left children
+    while (current->left != nullptr) {
+        current = current->left;
+    }
+
+    // 4. Return the data stored in the leftmost node
+    return current->data;
+}
 	
 	
 	
