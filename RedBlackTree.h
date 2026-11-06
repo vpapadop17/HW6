@@ -35,7 +35,7 @@ class RedBlackTree {
 
     
     void Insert(int value);
-    bool Contains(int value);
+    bool Contains(int value) const;
     int GetMin();
 };
 

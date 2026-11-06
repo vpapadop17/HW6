@@ -17,6 +17,12 @@
 
 using namespace std;
 
+
+RedBlackTree::RedBlackTree() {
+    root = nullptr;
+    numItems = 0;
+}
+
 bool RedBlackTree::Contains(int value) const {
     RBTNode* current = root;
     while (current != nullptr) {
@@ -41,12 +47,7 @@ void RedBlackTree::Insert(int value){
 		throw invalid_argument("Value already exists!"); 
 	}
 	
-	RBTNode* newnode = new RBTNode()
-	newnode->data = value;
-	newnode->color = COLOR_RED;  //all inserted nodes red
-	newnode->left = nullptr;     
-	newnode->right = nullptr;    
-	newnode->parent = nullptr;
+	RBTNode* newnode = new RBTNode(int value);
 	
 	if (root == nullptr){
 		newnode->color = COLOR_BLACK;
