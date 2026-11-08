@@ -1,5 +1,4 @@
 
-
 #include <iostream>
 #include <cassert>
 #include <random>
@@ -10,7 +9,7 @@ using namespace std;
 void TestSimpleConstructor(){
 	cout << "Testing Simple Constructor... " << endl;
 	RedBlackTree rbt = RedBlackTree();
-	//cout << "empty r-b-tree: " << rbt.ToInfixString() << endl;
+	//cout << "emptyd r-b-tree: " << rbt.ToInfixString() << endl;
 	assert(rbt.ToInfixString() == "");
 	
 	cout << "PASSED!"<< endl << endl;
@@ -219,10 +218,13 @@ void TestContains(){
 	rbt->Insert(34);
 	
 	assert(rbt->Contains(34));
+	assert(rbt->Contains(40) == true);
+    assert(rbt->Contains(22) == true);
+    assert(rbt->Contains(15) == true);
+    assert(rbt->Contains(63) == false);
 	delete rbt;
 
 	
-	cout << "TESTS MISSING" << endl << endl;
 	cout << "PASSED!" << endl << endl;
 }
 
@@ -232,7 +234,19 @@ void TestContains(){
 void TestGetMinimumMaximum(){
 	cout << "Testing Get Minimum and Get Maximum..." << endl;
 
-	cout << "TESTS MISSING" << endl << endl;
+	RedBlackTree rbt = RedBlackTree();
+    rbt.Insert(50);
+    rbt.Insert(22);
+    rbt.Insert(1);
+    rbt.Insert(33);
+    rbt.Insert(65);
+
+    assert(rbt.GetMin() == 1);
+    assert(rbt.GetMax() == 65);
+
+    assert(rbt.Size() == 5);
+
+    cout << "PASSED!" << endl << endl;
 
 	cout << "PASSED!" << endl << endl;
 }

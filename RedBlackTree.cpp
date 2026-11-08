@@ -1,4 +1,4 @@
-
+#include <queue>
 #include <iostream>
 #include <cassert>
 #include <random>
@@ -17,10 +17,17 @@
 
 using namespace std;
 
-
 RedBlackTree::RedBlackTree() {
     root = nullptr;
     numItems = 0;
+}
+
+RedBlackTree::RedBlackTree(int value) {
+    root = nullptr;
+    numItems = 0;
+    if (value != -99999) {
+        Insert(value);
+    }
 }
 
 bool RedBlackTree::Contains(int value) const {
@@ -180,7 +187,7 @@ void RedBlackTree::Insert(int value) {
     root->color = COLOR_BLACK;
 }
 	
-int RedBlackTree::GetMin(){
+int RedBlackTree::GetMin() const{
 	if (root == nullptr) {
         throw runtime_error("Tree is empty");
     }
@@ -197,7 +204,7 @@ int RedBlackTree::GetMin(){
     return current->data;
 }
 	
-int RedBlackTree::GetMax() {
+int RedBlackTree::GetMax() const{
     //Check if empty
     if (root == nullptr) {
         throw std::runtime_error("Tree is empty");
@@ -214,33 +221,111 @@ int RedBlackTree::GetMax() {
     //Return the data stored in the node that is at the last right spot
     return current->data;
 }
-	
 
-void TestSimpleConstructor(){
-	cout << "Testing Simple Constructor... " << endl;
-	RedBlackTree rbt = RedBlackTree();
-	//cout << "empty r-b-tree: " << rbt.ToInfixString() << endl;
-	assert(rbt.ToInfixString() == "");
-	
-	cout << "PASSED!"<< endl << endl;
+unsigned long long int RedBlackTree::Size() const {
+    return numItems;
 }
 
+string RedBlackTree::ToInfixString(RBTNode* n) const {
+    if (n == nullptr) {
+        return "";
+    }
 
-void TestInsertFirstNode(){
-	cout << "Testing Insert One Node..." << endl;
-	RedBlackTree rbt = RedBlackTree();
-	rbt.Insert(30);
-	//cout << "rbt: " << rbt.ToPrefixString() << endl;
-	assert(rbt.ToInfixString() == " B30 ");
-
-	cout << "PASSED!" << endl << endl;
+    string result = "";
+    result += ToInfixString(n->left);
+    
+    // Add color prefix and data value
+    if (n->color == COLOR_BLACK) {
+        result += " B" + to_string(n->data) + " ";
+    } else {
+        result += " R" + to_string(n->data) + " ";
+    }
+    
+    result += ToInfixString(n->right);
+    return result;
 }
 
+string RedBlackTree::ToPrefixString(RBTNode* n) const {
+    if (n == nullptr) {
+        return "";
+    }
 
-int main(){	
-	TestSimpleConstructor();
-	TestInsertFirstNode();
+    string result = "";
+    
+    // Process root/current node first
+    if (n->color == COLOR_BLACK) {
+        result += " B" + to_string(n->data) + " ";
+    } else {
+        result += " R" + to_string(n->data) + " ";
+    }
+    
+    result += ToPrefixString(n->left);
+    result += ToPrefixString(n->right);
+    return result;
+}
 
-	cout << "ALL TESTS PASSED!!" << endl;
-	return 0;
+std::string RedBlackTree::ToPostfixString(RBTNode* n) const {
+    if (n == nullptr) {
+        return "";
+    }
+
+    string result = "";
+    result += ToPostfixString(n->left);
+    result += ToPostfixString(n->right);
+    
+    // Process root/current node last
+    if (n->color == COLOR_BLACK) {
+        result += " B" + to_string(n->data) + " ";
+    } else {
+        result += " R" + to_string(n->data) + " ";
+    }
+    
+    return result;
+}
+
+RedBlackTree::RedBlackTree(const RedBlackTree& other) {
+    root = nullptr;
+    numItems = 0;
+
+    // If the other tree is empty finished
+    if (other.root == nullptr) {
+        return;
+    }
+
+    queue<RBTNode*> q;
+    q.push(other.root);
+
+    while (!q.empty()) {
+        RBTNode* current = q.front();
+        q.pop();
+
+        // Insert current node's value into our new tree
+        Insert(current->data);
+
+        // Push children into the queue to visit next
+        if (current->left != nullptr) {
+            q.push(current->left);
+        }
+        if (current->right != nullptr) {
+            q.push(current->right);
+        }
+    }
+}
+
+RedBlackTree::~RedBlackTree() {
+    while (root != nullptr) {
+        if (root->left != nullptr) {
+            // Rotate the tree right to flatten the left branch
+            RBTNode* temp = root->left;
+            root->left = temp->right;
+            temp->right = root;
+            root = temp;
+        } else {
+            // Move down to the right and delete the leaf
+            RBTNode* temp = root;
+            root = root->right;
+            delete temp;
+        }
+    }
+    numItems = 0;
 }
