@@ -37,48 +37,152 @@ bool RedBlackTree::Contains(int value) const {
     return false;
 }
 
-//this is teh website I used to figure out how to set the thing equal to a color 
-//https://www.geeksforgeeks.org/dsa/introduction-to-red-black-tree/
-void RedBlackTree::Insert(int value){
-	
-	//check if I already have this value in the tree
-	bool isDuplicate = Contains(value);
-	if (isDuplicate == true){
-		throw invalid_argument("Value already exists!"); 
-	}
-	
-	RBTNode* newnode = new RBTNode(int value);
-	
-	if (root == nullptr){
-		newnode->color = COLOR_BLACK;
-		root = newnode; 
-		numItems++;
-		return ;
-	}
-	RBTNode* current = root; 
-	RBTNode* parentNode = nullptr; //when i increment later I will need to know what teh previous node was 
-	
-	while (current != nullptr){
-		parentNode = current; 
-		if (value < current->data){
-			current = current->left; 
-		} else {
-			current = current->right;
-		}
-	} 
-	newnode->parent = parentNode; 
-	
-	if (value < parentNode->data) {
-    parentNode->left = newnode;
-	} else {
-		parentNode->right = newnode;
-	}
-	numItems++;
+
+void RedBlackTree::Insert(int value) {
+    // Check if the value is already present in the tree (throw exception if it is)
+    bool isDuplicate = Contains(value);
+    if (isDuplicate == true) {
+        throw invalid_argument("Value already exists!"); 
+    }
+
+    RBTNode* newnode = new RBTNode(value);
+
+    //Step 1: If tree is empty, make newnode the root with color Black and exit
+    if (root == nullptr) {
+        newnode->color = COLOR_BLACK;
+        root = newnode; 
+        numItems++;
+        return;
+    }
+
+    //Step 2
+    RBTNode* current = root; 
+    RBTNode* parentNode = nullptr; 
+
+    while (current != nullptr) {
+        parentNode = current; 
+        if (value < current->data) {
+            current = current->left; 
+        } else {
+            current = current->right;
+        }
+    } 
+
+    // Set parent and child connections
+    newnode->parent = parentNode; 
+    if (value < parentNode->data) {
+        parentNode->left = newnode;
+    } else {
+        parentNode->right = newnode;
+    }
+    numItems++;
+
+    //This is what rebalances teh tree
+    //Step 3: If parent is Black, loop won't run and we exit
+    //Step 4: If parent is Red, enter loop to check uncle's color
+    while (newnode != root && newnode->parent->color == COLOR_RED) {
+        RBTNode* pNode = newnode->parent;
+        RBTNode* gNode = pNode->parent;
+
+        //Parent is the left child of Grandparent
+        if (pNode == gNode->left) {
+            RBTNode* uncle = gNode->right;
+
+            //Step 6: Uncle is RED 
+            if (uncle != nullptr && uncle->color == COLOR_RED) {
+                pNode->color = COLOR_BLACK;
+                uncle->color = COLOR_BLACK;
+                gNode->color = COLOR_RED;
+                newnode = gNode; // Move up to check Grandparent 
+            } 
+            // STEP 5: Uncle is black or null
+            else {
+                //The left right case, rotate Left around Parent to make it a straight line[cite: 6]
+                if (newnode == pNode->right) {
+                    newnode = pNode;
+                    
+                    //Rotate Left around newnode
+                    RBTNode* temp = newnode->right;
+                    newnode->right = temp->left;
+                    if (temp->left != nullptr) temp->left->parent = newnode;
+                    temp->parent = newnode->parent;
+                    if (newnode->parent == nullptr) root = temp;
+                    else if (newnode == newnode->parent->left) newnode->parent->left = temp;
+                    else newnode->parent->right = temp;
+                    temp->left = newnode;
+                    newnode->parent = temp;
+                }
+
+                //The left left case: recolor and rotate right around Grandparent
+                newnode->parent->color = COLOR_BLACK;
+                gNode->color = COLOR_RED;
+
+                //Rotate right around gNode
+                RBTNode* temp = gNode->left;
+                gNode->left = temp->right;
+                if (temp->right != nullptr) temp->right->parent = gNode;
+                temp->parent = gNode->parent;
+                if (gNode->parent == nullptr) root = temp;
+                else if (gNode == gNode->parent->right) gNode->parent->right = temp;
+                else gNode->parent->left = temp;
+                temp->right = gNode;
+                gNode->parent = temp;
+            }
+        } 
+        //Parent is the right child of Grandparent
+        else {
+            RBTNode* uncle = gNode->left;
+
+            //Step 6: Uncle is red 
+            if (uncle != nullptr && uncle->color == COLOR_RED) {
+                pNode->color = COLOR_BLACK;
+                uncle->color = COLOR_BLACK;
+                gNode->color = COLOR_RED;
+                newnode = gNode; // Move up to check Grandparent next[cite: 6]
+            } 
+            //Step 5: Uncle is black or null
+            else {
+                //The right left case: Rotate righ around parent
+                if (newnode == pNode->left) {
+                    newnode = pNode;
+
+                    //Rotate Right around newnode (pNode)
+                    RBTNode* temp = newnode->left;
+                    newnode->left = temp->right;
+                    if (temp->right != nullptr) temp->right->parent = newnode;
+                    temp->parent = newnode->parent;
+                    if (newnode->parent == nullptr) root = temp;
+                    else if (newnode == newnode->parent->right) newnode->parent->right = temp;
+                    else newnode->parent->left = temp;
+                    temp->right = newnode;
+                    newnode->parent = temp;
+                }
+
+                //The right right case: Recolor and rotate left around Grandparent
+                newnode->parent->color = COLOR_BLACK;
+                gNode->color = COLOR_RED;
+
+                //Rotate left around gNode
+                RBTNode* temp = gNode->right;
+                gNode->right = temp->left;
+                if (temp->left != nullptr) temp->left->parent = gNode;
+                temp->parent = gNode->parent;
+                if (gNode->parent == nullptr) root = temp;
+                else if (gNode == gNode->parent->left) gNode->parent->left = temp;
+                else gNode->parent->right = temp;
+                temp->left = gNode;
+                gNode->parent = temp;
+            }
+        }
+    }
+
+    //Ensure the root is black
+    root->color = COLOR_BLACK;
 }
 	
-int RedBlackTree::GetMin(RBTNode* node){
+int RedBlackTree::GetMin(){
 	if (root == nullptr) {
-        throw std::runtime_error("Tree is empty");
+        throw runtime_error("Tree is empty");
     }
 
     // 2. Start at the root
@@ -93,7 +197,23 @@ int RedBlackTree::GetMin(RBTNode* node){
     return current->data;
 }
 	
-	
+int RedBlackTree::GetMax() {
+    //Check if empty
+    if (root == nullptr) {
+        throw std::runtime_error("Tree is empty");
+    }
+
+    //Start at the root
+    RBTNode* current = root;
+
+    //Keep moving right until there are no right children
+    while (current->right != nullptr) {
+        current = current->right;
+    }
+
+    //Return the data stored in the node that is at the last right spot
+    return current->data;
+}
 	
 
 void TestSimpleConstructor(){
