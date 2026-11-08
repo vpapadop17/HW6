@@ -284,30 +284,53 @@ std::string RedBlackTree::ToPostfixString(RBTNode* n) const {
 }
 
 RedBlackTree::RedBlackTree(const RedBlackTree& other) {
-    root = nullptr;
-    numItems = 0;
 
-    // If the other tree is empty finished
+    root = nullptr;
+    numItems = other.numItems;
+
     if (other.root == nullptr) {
         return;
     }
 
-    queue<RBTNode*> q;
-    q.push(other.root);
+    queue<const RBTNode*> originalQueue;
+    queue<RBTNode*> copyQueue;
 
-    while (!q.empty()) {
-        RBTNode* current = q.front();
-        q.pop();
+    // Copy the root
+    root = new RBTNode(other.root->data);
+    root->color = other.root->color;
 
-        // Insert current node's value into our new tree
-        Insert(current->data);
+    originalQueue.push(other.root);
+    copyQueue.push(root);
 
-        // Push children into the queue to visit next
-        if (current->left != nullptr) {
-            q.push(current->left);
+    // Copy the remaining nodes
+    while (!originalQueue.empty()) {
+
+        const RBTNode* original = originalQueue.front();
+        originalQueue.pop();
+
+        RBTNode* copy = copyQueue.front();
+        copyQueue.pop();
+
+        // Copy left child
+        if (original->left != nullptr) {
+
+            copy->left = new RBTNode(original->left->data);
+            copy->left->color = original->left->color;
+            copy->left->parent = copy;
+
+            originalQueue.push(original->left);
+            copyQueue.push(copy->left);
         }
-        if (current->right != nullptr) {
-            q.push(current->right);
+
+        // Copy right child
+        if (original->right != nullptr) {
+
+            copy->right = new RBTNode(original->right->data);
+            copy->right->color = original->right->color;
+            copy->right->parent = copy;
+
+            originalQueue.push(original->right);
+            copyQueue.push(copy->right);
         }
     }
 }

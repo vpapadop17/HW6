@@ -54,13 +54,14 @@ void TestInsertSecondNode(){
 
 void TestInsertThirdNode(){
 	cout << "Testing Insert Third Node..." << endl;
+	
 	RedBlackTree *rbt = new RedBlackTree();
 	rbt->Insert(30);
-	rbt->Insert(15);
-	rbt->Insert(10); // Left Left
-	//cout << "rbt: "  << rbt->ToPrefixString() << endl;
-	assert(rbt->ToPrefixString() == " B15  R10  R30 ");
-	delete rbt;
+    rbt->Insert(15);
+    rbt->Insert(10);
+    assert(rbt->ToPrefixString() == " B15  R10  R30 ");
+    delete rbt;
+	
 	
 	rbt = new RedBlackTree(); 
 	rbt->Insert(30);
@@ -79,14 +80,44 @@ void TestInsertThirdNode(){
 	// more tests go here
 	// consider some symmetry!
 	
-	cout << "TESTS MISSING" << endl << endl;
+	// Left-Left
+	rbt = new RedBlackTree();
+	rbt->Insert(30);
+	rbt->Insert(15);
+	rbt->Insert(10);
+	assert(rbt->ToPrefixString() == " B15  R10  R30 ");
+	delete rbt;
+
+	// Right-Left
+	rbt = new RedBlackTree();
+	rbt->Insert(30);
+	rbt->Insert(15);
+	rbt->Insert(25);
+	assert(rbt->ToPrefixString() == " B25  R15  R30 ");
+	delete rbt;
+
+	// Right-Right
+	rbt = new RedBlackTree();
+	rbt->Insert(10);
+	rbt->Insert(20);
+	rbt->Insert(30);
+	assert(rbt->ToPrefixString() == " B20  R10  R30 ");
+	delete rbt;
+
 	cout << "PASSED!" << endl << endl;
 }
 
 void TestInsertFourthNode(){
 	cout << "Testing Insert Fourth Node..." << endl;
 
-	cout << "TESTS MISSING" << endl << endl;
+	RedBlackTree rbt;
+    rbt.Insert(30);
+    rbt.Insert(15);
+    rbt.Insert(10);
+    rbt.Insert(20);
+
+    assert(rbt.Size() == 4);
+    assert(rbt.ToPrefixString() == " B15  B10  B30  R20 ");
 	
 	cout << "PASSED!" << endl << endl;
 }
