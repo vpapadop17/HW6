@@ -264,7 +264,7 @@ string RedBlackTree::ToPrefixString(RBTNode* n) const {
     return result;
 }
 
-std::string RedBlackTree::ToPostfixString(RBTNode* n) const {
+string RedBlackTree::ToPostfixString(RBTNode* n) const {
     if (n == nullptr) {
         return "";
     }
@@ -333,6 +333,68 @@ RedBlackTree::RedBlackTree(const RedBlackTree& other) {
             copyQueue.push(copy->right);
         }
     }
+}
+
+RBTNode* RedBlackTree::GetInOrderSuccessor(RBTNode* node) const {
+    // right, then all left and take it
+    RBTNode* curr = node->right;
+    while (curr->left != nullptr) {
+        curr = curr->left;
+    }
+    return curr;
+}
+
+void RedBlackTree::Remove(int data) {
+	RBTNode* D = root;
+
+    //Search for the node
+    while (D != nullptr && D->data != data) {
+        if (data < D->data) {
+            D = D->left;
+        } else {
+            D = D->right;
+        }
+    }
+        if (D == nullptr) {
+			throw std::invalid_argument("Value not foudn in Tree!";	
+		}
+		// If D has two children, swap data with in-order successor
+		// and make the successor the new node D 
+		if (D->left != nullptr && D->right != nullptr) {
+			RBTNode* successor = GetInOrderSuccessor(D);
+			D->data = successor->data;
+			D = successor;
+		}
+		
+		
+		
+		
+		
+		
+		
+		
+		
+    }
+    
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 }
 
 RedBlackTree::~RedBlackTree() {

@@ -5,6 +5,7 @@
 
 const int COLOR_RED = 0;
 const int COLOR_BLACK = 1;
+const int COLOR_DOUBLE_BLACK = 2;
 
 struct RBTNode {
     int data;
@@ -12,6 +13,7 @@ struct RBTNode {
     RBTNode* left;
     RBTNode* right;
     RBTNode* parent;
+    bool isNullNode;
 
     RBTNode(int val) {
         data = val;
@@ -19,6 +21,7 @@ struct RBTNode {
         left = nullptr;
         right = nullptr;
         parent = nullptr;
+        isNullNode = isNull;
     }
 };
 
@@ -31,6 +34,10 @@ private:
     std::string ToInfixString(RBTNode* n) const;
     std::string ToPrefixString(RBTNode* n) const;
     std::string ToPostfixString(RBTNode* n) const;
+    void RotateLeft(RBTNode* x);
+    void RotateRight(RBTNode* x);
+    void FixDoubleBlack(RBTNode* dbNode);
+    RBTNode* GetInOrderSuccessor(RBTNode* node) const;
 
 public:
     // Constructors & Destructor
@@ -50,6 +57,9 @@ public:
     int GetMin() const;
     int GetMax() const;
     unsigned long long int Size() const;
+    
+    void Remove(int data);
+    ~RedBlackTree();
 };
 
 #endif // REDBLACKTREE_H
