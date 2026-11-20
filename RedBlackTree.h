@@ -25,7 +25,7 @@ struct RBTNode {
     if (isNullNode) {
         color = COLOR_BLACK;
     }
-};
+	};
 
 class RedBlackTree {
 private:
