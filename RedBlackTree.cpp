@@ -4,6 +4,10 @@
 #include <random>
 #include "RedBlackTree.h"
 
+// Citations & Resources:
+// - Red-Black Tree deletion reference: http://www.cs.toronto.edu/~wgeorge/csc265/2013/09/26/tutorial-3-red-black-tree-deletion.html
+// https://www.usna.edu/Users/cs/crabbe/SI321/current/red-black/red-black.html
+
 /**
  * 
  * This "First Step" tests file is useful to get your project started
