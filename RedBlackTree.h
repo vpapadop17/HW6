@@ -15,13 +15,15 @@ struct RBTNode {
     RBTNode* parent;
     bool isNullNode;
 
-    RBTNode(int val) {
-        data = val;
-        color = COLOR_RED; // New node is red
-        left = nullptr;
-        right = nullptr;
-        parent = nullptr;
-        isNullNode = isNull;
+    RBTNode(int val, bool isNull = false) {
+    data = val;
+    color = COLOR_RED;
+    left = nullptr;
+    right = nullptr;
+    parent = nullptr;
+    isNullNode = isNull;
+    if (isNullNode) {
+        color = COLOR_BLACK;
     }
 };
 
@@ -59,7 +61,6 @@ public:
     unsigned long long int Size() const;
     
     void Remove(int data);
-    ~RedBlackTree();
 };
 
 #endif // REDBLACKTREE_H

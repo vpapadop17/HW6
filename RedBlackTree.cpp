@@ -344,6 +344,56 @@ RBTNode* RedBlackTree::GetInOrderSuccessor(RBTNode* node) const {
     return curr;
 }
 
+void RedBlackTree::RotateLeft(RBTNode* x) {
+	//grab the nodes we want to change right child and call it y, x is teh node i want to rotate 
+    RBTNode* y = x->right;
+    //y is going to put x on its left
+    x->right = y->left;
+    //if y has a left child, then make x its new parent 
+    if (y->left != nullptr) {
+        y->left->parent = x;
+    }
+    //connect y to x's old parent to complete the transfornation
+    y->parent = x->parent;
+    //if x had NO parent then make it the root
+    if (x->parent == nullptr) {
+        root = y;
+        //if it was on the left side of somehting then hold it on the left side
+    } else if (x == x->parent->left) {
+        x->parent->left = y;
+    } else {
+		//the same as above but on the right 
+        x->parent->right = y;
+    }
+    //putu x underneath y as its left child 
+    y->left = x;
+    //make x the parent of y 
+    x->parent = y;
+}
+
+void RedBlackTree::RotateRight(RBTNode* x) {
+	//Grab x's left child and call it y 
+    RBTNode* y = x->left;
+    //y is about to put x on its rigth side , so y's old left child becomes x's left one
+    x->left = y->right;
+    //if y has a rigth child then its new parent is x 
+    if (y->right != nullptr) {
+        y->right->parent = x;
+    }
+    //connect y to x's old parent 
+    y->parent = x->parent;
+    //if no parent make it root 
+    if (x->parent == nullptr) {
+        root = y;
+    } else if (x == x->parent->right) {
+        x->parent->right = y;
+    } else {
+        x->parent->left = y;
+    }
+    y->right = x;
+    x->parent = y;
+}
+
 void RedBlackTree::Remove(int data) {
 	RBTNode* D = root;
 
@@ -356,61 +406,167 @@ void RedBlackTree::Remove(int data) {
         }
     }
         if (D == nullptr) {
-			throw std::invalid_argument("Value not foudn in Tree!";	
+			throw std::invalid_argument("Value not found in Tree!");	
 		}
-		// If D has two children, swap data with in-order successor
+		// If D has two children, swap with in-order successor
 		// and make the successor the new node D 
 		if (D->left != nullptr && D->right != nullptr) {
 			RBTNode* successor = GetInOrderSuccessor(D);
 			D->data = successor->data;
 			D = successor;
 		}
+		// 3. Find replacement node R (D now has at most 1 non-null child)
+		RBTNode* R = nullptr;
+		if (D->left != nullptr) {
+			R = D->left;
+		} else if (D->right != nullptr) {
+			R = D->right;
+		} else {
+			// D has no child therefore, create a black null as R
+			R = new RBTNode(0, true);
+		}
+		// Replace D with R in the tree, make D's parent R's parent
+		RBTNode* parent = D->parent;
+		//get R to have that as a parent
+		R->parent = parent;
+		if (parent == nullptr) {
+			root = R;
+		} else if (D == parent->left) {
+			parent->left = R;
+		} else {
+			parent->right = R;
+		}
+
+		//we need to know the color of D before we delete it 
+		unsigned short int deletedColor = D->color;
+		delete D;
+		numItems--;
 		
-		
-		
-		
-		
-		
-		
-		
+		if (R == root) {
+        // Rule 1: R is at root position -> mark black and stop
+        R->color = COLOR_BLACK;
+		} else if (deletedColor == COLOR_RED) {
+			// Rule 2: Deleted node D was red -> mark R black and stop
+			R->color = COLOR_BLACK;
+			//at this point I know that D was black here on
+		} else if (R->color == COLOR_RED) {
+        // Rule 3: Replacement node R is red -> mark R black and stop
+			R->color = COLOR_BLACK;
+		} else {
+        // Rule 4: Both D and R are black -> Double Black!
+			R->color = COLOR_DOUBLE_BLACK;
+			FixDoubleBlack(R);
+		}
+		 // Clean up  null node so no invisible nodes stay in the tree
+		 //if R is not nullnode it skips this
+		if (R->isNullNode) {
+			if (R == root) {
+				root = nullptr;
+		//If the fake node is hanging on its parent's left side, unhook it and set that left side back to nullptr
+        } else if (R->parent->left == R) {
+            R->parent->left = nullptr;
+        //same as above but for right
+        } else if (R->parent->right == R) {
+            R->parent->right = nullptr;
+        }
+        delete R;
+		}	
 		
     }
+
+
+
+void RedBlackTree::FixDoubleBlack(RBTNode* dbNode) {
+	// 1: Double black is at the root -> remove it and mark root black
+    if (dbNode == root) {
+        dbNode->color = COLOR_BLACK;
+        return;
+    }
+    RBTNode* parent = dbNode->parent;
+    bool dbIsLeftChild = false;
+	RBTNode* sibling = nullptr;
+
+	if (dbNode == parent->left) {
+		dbIsLeftChild = true;
+		sibling = parent->right; // If dbNode is on the left, its sibling is on the right
+	} else {
+		dbIsLeftChild = false;
+		sibling = parent->left;  // If dbNode is on the right, its sibling is on the left
+	}
+	// Case 3: Sibling is RED
+    if (sibling != nullptr && sibling->color == COLOR_RED) {
+        parent->color = COLOR_RED;
+        sibling->color = COLOR_BLACK;
+        if (dbIsLeftChild) {
+            RotateLeft(parent);  // Sibling on right -> left rotate parent
+        } else {
+            RotateRight(parent); // Sibling on left -> right rotate parent
+        }
+        // Double black still isn't fixed, recall function to fall into new case
+        FixDoubleBlack(dbNode);
+        return;
+    }
+    // Case 2: Sibling is BLACK
+    if (sibling == nullptr) {
+    return;
+	}
+    bool leftRed = (sibling->left != nullptr && sibling->left->color == COLOR_RED);
+    bool rightRed = (sibling->right != nullptr && sibling->right->color == COLOR_RED);
+
+    //2a: Sibling has all black children (no red children)
+    if (!leftRed && !rightRed) {
+        sibling->color = COLOR_RED;
+        dbNode->color = COLOR_BLACK;
+
+        if (parent->color == COLOR_RED) {
+            parent->color = COLOR_BLACK;
+        } else {
+            parent->color = COLOR_DOUBLE_BLACK;
+            FixDoubleBlack(parent);
+        }
+        return;
+    }
+        // Subcase 2b: Sibling has 1 or 2 red children
+    if (!dbIsLeftChild) {
+        // Sibling is on the LEFT (LL or LR)
+        if (leftRed) {
+            // 1) LL case: sibling on left + red child on left (or two red children)
+            sibling->left->color = sibling->color;
+            sibling->color = parent->color;
+            parent->color = COLOR_BLACK;
+            dbNode->color = COLOR_BLACK;
+            RotateRight(parent);
+        } else {
+            // 2) LR case: sibling on left + 1 red child on right
+            sibling->right->color = parent->color;
+            parent->color = COLOR_BLACK;
+            dbNode->color = COLOR_BLACK;
+            RotateLeft(sibling);
+            RotateRight(parent);
+        }
+    } else {
+        // Sibling is on the RIGHT (RR or RL)
+        if (rightRed) {
+            // 3) RR case: sibling on right + red child on right (or two red children)
+            sibling->right->color = sibling->color;
+            sibling->color = parent->color;
+            parent->color = COLOR_BLACK;
+            dbNode->color = COLOR_BLACK;
+            RotateLeft(parent);
+        } else {
+            // 4) RL case: sibling on right + 1 red child on left
+            sibling->left->color = parent->color;
+            parent->color = COLOR_BLACK;
+            dbNode->color = COLOR_BLACK;
+            RotateRight(sibling);
+            RotateLeft(parent);
+        }
+    }
     
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
 }
 
 RedBlackTree::~RedBlackTree() {
     while (root != nullptr) {
-        if (root->left != nullptr) {
-            // Rotate the tree right to flatten the left branch
-            RBTNode* temp = root->left;
-            root->left = temp->right;
-            temp->right = root;
-            root = temp;
-        } else {
-            // Move down to the right and delete the leaf
-            RBTNode* temp = root;
-            root = root->right;
-            delete temp;
-        }
+        Remove(root->data);
     }
-    numItems = 0;
 }
