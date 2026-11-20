@@ -283,7 +283,54 @@ void TestGetMinimumMaximum(){
 }
 
 
+void TestRemove() {
+	cout << "Testing Remove..." << endl;
 
+	// Build the tree that we had on worksheet
+	RedBlackTree rbt;
+	rbt.Insert(160);
+	rbt.Insert(388);
+	rbt.Insert(434);
+	rbt.Insert(88);
+	rbt.Insert(79);
+	assert(rbt.ToPrefixString() == " B388  B88  R79  R160  B434 ");
+
+	// Remove red leaf (160)
+	rbt.Remove(160);
+	assert(rbt.Size() == 4);
+	assert(rbt.ToPrefixString() == " B388  B88  R79  B434 ");
+
+	// Remove 2-child root (388) ->  double-black LL rotation
+	rbt.Remove(388);
+	assert(rbt.Size() == 3);
+	assert(rbt.ToPrefixString() == " B88  B79  B434 ");
+
+	// Remove black leaf (434) -> double-black recolor
+	rbt.Remove(434);
+	assert(rbt.Size() == 2);
+	assert(rbt.ToPrefixString() == " B88  R79 ");
+
+	// Remove 1-child root (88)
+	rbt.Remove(88);
+	assert(rbt.Size() == 1);
+	assert(rbt.ToPrefixString() == " B79 ");
+
+	// Remove last node (79) -> empty tree
+	rbt.Remove(79);
+	assert(rbt.Size() == 0);
+	assert(rbt.ToPrefixString() == "");
+
+	// Test removing non-existent value throws exception
+	bool threw = false;
+	try {
+		rbt.Remove(999);
+	} catch (const invalid_argument&) {
+		threw = true;
+	}
+	assert(threw);
+
+	cout << "PASSED!" << endl << endl;
+}
 
 
 int main(){
@@ -305,6 +352,7 @@ int main(){
 
 	TestContains();
 	TestGetMinimumMaximum();
+	TestRemove();
 
 	
 	cout << "ALL TESTS PASSED!!" << endl;

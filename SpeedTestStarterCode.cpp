@@ -1,4 +1,5 @@
 #include <cstdlib>
+#include <iostream>
 #include <ctime>
 #include "RedBlackTree.h"
 
@@ -22,7 +23,15 @@ int main(){
 
 
 	// Your code goes here to simulate leaving / joining.
+	start = clock();
+	for (int i = 0; i < 100000; i++) {
+		rbt.Remove(i);      // ID i leaves
+		rbt.Insert(N + i);  // New ID (3700000 + i) joins
+	}
+	stop = clock();
 
+	duration = (static_cast<double>(stop - start)) / CLOCKS_PER_SEC;
+	cout << "Simulated 100,000 leave/join operations in " << duration << " seconds." << endl;
 
 	return 0;
 }
