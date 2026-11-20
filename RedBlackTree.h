@@ -16,16 +16,17 @@ struct RBTNode {
     bool isNullNode;
 
     RBTNode(int val, bool isNull = false) {
-    data = val;
-    color = COLOR_RED;
-    left = nullptr;
-    right = nullptr;
-    parent = nullptr;
-    isNullNode = isNull;
-    if (isNullNode) {
-        color = COLOR_BLACK;
+        data = val;
+        color = COLOR_RED;
+        left = nullptr;
+        right = nullptr;
+        parent = nullptr;
+        isNullNode = isNull;
+        if (isNullNode) {
+            color = COLOR_BLACK;
+        }
     }
-	};
+};
 
 class RedBlackTree {
 private:
