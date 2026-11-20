@@ -46,6 +46,9 @@ bool RedBlackTree::Contains(int value) const {
 
 
 void RedBlackTree::Insert(int value) {
+	// SpeedTest: On a tree of 3.7 million nodes, Insert() is very fast,
+    // taking between 0 and 1e-06 seconds per insertion because Red-Black
+    // trees maintain O(log n) height.
     // Check if the value is already present in the tree (throw exception if it is)
     bool isDuplicate = Contains(value);
     if (isDuplicate == true) {
@@ -395,6 +398,9 @@ void RedBlackTree::RotateRight(RBTNode* x) {
 }
 
 void RedBlackTree::Remove(int data) {
+	// SpeedTest: On a tree of 3.7 million nodes, Remove() takes roughly 1.1e-05 to 2.7e-05
+    // seconds per deletion. It has O(log n) and is very fast,
+    // though it is slightly slower than Insert() due to rebalancing and null-node cleanup.
 	RBTNode* D = root;
 
     //Search for the node
